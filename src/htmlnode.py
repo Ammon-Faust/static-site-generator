@@ -1,14 +1,15 @@
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
-        self.tag = tag
-        self.value = value
-        self.children = children
-        self.props = props
+        # Initialize an HTML node with optional args
+        self.tag = tag              # HTML Tag ('p', 'a', 'div', etc..)
+        self.value = value          # The text content of a node
+        self.children = children    # Child nodes (None for leaf nodes)
+        self.props = props          # HTML attributes as key-value pairs
 
-    def to_html(self):
+    def to_html(self): # Will be implemented for child classes
         raise NotImplementedError
 
-    def props_to_html(self):
+    def props_to_html(self): # Updates props dict to HTML
         if not self.props:
             return ""
         html_props = ""
@@ -21,10 +22,10 @@ class HTMLNode:
 
 
 class LeafNode(HTMLNode):
-    def __init__(self, value, tag=None, props=None):
+    def __init__(self, value, tag=None, props=None): # Setting contructor for optional tags, props, and no children
         super().__init__(tag=tag, value=value, children=None, props=props)
         
-    def to_html(self):
+    def to_html(self): # Converting to HTML
         if self.value is None:
             raise ValueError("All leaf nodes must have a value.")
         elif self.tag is None:
