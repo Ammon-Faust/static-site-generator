@@ -2,12 +2,12 @@ import unittest
 
 from htmlnode import *
 
+
 class TestHTMLNode(unittest.TestCase):
     # Test that HTMLNode can be initialized with None values
     def test_None(self):
         node = HTMLNode(None, None, None, None)
-    
-    # Test that multiple properties are correctly converted to HTML
+   # Test that multiple properties are correctly converted to HTML
     def test_props_to_html_with_multiple_props(self):
         node = HTMLNode(props={"href": "https://www.google.com", "target": "_blank"})
         expected_output = ' href="https://www.google.com" target="_blank"'  # Ensure there is a space here
@@ -26,6 +26,7 @@ class TestHTMLNode(unittest.TestCase):
         expected_output = ' class="test-class"'
         self.assertEqual(node.props_to_html(), expected_output)
 
+
 class TestLeafNode(unittest.TestCase):
     # Test that a value is required
     def test_empty_value(self):
@@ -38,7 +39,7 @@ class TestLeafNode(unittest.TestCase):
         node = LeafNode("This is a test!", None, None)
         expected_output = "This is a test!"
         self.assertEqual(node.to_html(), expected_output)
-    
+
     # Test that tags are properly appended
     def test_tag(self):
         node = LeafNode("This is a test!", "p", None)
@@ -47,9 +48,16 @@ class TestLeafNode(unittest.TestCase):
 
     # Test if props append correctly
     def test_props(self):
-        node = LeafNode("This is a test!", "a", props={"href": "https://www.google.com", "target": "_blank"})
-        expected_output = '<a href="https://www.google.com" target="_blank">This is a test!</a>'
+        node = LeafNode(
+            "This is a test!",
+            "a",
+            props={"href": "https://www.google.com", "target": "_blank"},
+        )
+        expected_output = (
+            '<a href="https://www.google.com" target="_blank">This is a test!</a>'
+        )
         self.assertEqual(node.to_html(), expected_output)
+
 
 class TestParentNode(unittest.TestCase):
     # Test if an empty list for children is passed
@@ -57,13 +65,12 @@ class TestParentNode(unittest.TestCase):
         node = ParentNode("p", [], None)
         with self.assertRaises(ValueError):
             node.to_html()
-            
+
     # Test if there is no child
     def test_no_child(self):
         node = ParentNode("p", None, None)
         with self.assertRaises(ValueError):
             node.to_html()
-
 
     # Test for no tag
     def test_no_tag(self):
@@ -78,7 +85,7 @@ class TestParentNode(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             node.to_html()
-    
+
     # Test for a single child
     def test_single_child(self):
         node = ParentNode(
@@ -89,7 +96,6 @@ class TestParentNode(unittest.TestCase):
         )
         expected_output = "<p><b>Bold text</b></p>"
         self.assertEqual(node.to_html(), expected_output)
-
 
     # Test multple children
     def test_multiple_children(self):
@@ -102,34 +108,46 @@ class TestParentNode(unittest.TestCase):
                 LeafNode("Normal text", None),
             ],
         )
-        expected_output = "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>"
+        expected_output = (
+            "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>"
+        )
         self.assertEqual(node.to_html(), expected_output)
-    
+
     # Test parent prop
     def test_prop(self):
         node = ParentNode(
             "a",
             [
                 LeafNode("Bold text", "b"),
-            ], props={"href": "https://www.google.com", "target": "_blank"}
+            ],
+            props={"href": "https://www.google.com", "target": "_blank"},
         )
-        expected_output = '<a href="https://www.google.com" target="_blank"><b>Bold text</b></a>'
+        expected_output = (
+            '<a href="https://www.google.com" target="_blank"><b>Bold text</b></a>'
+        )
         self.assertEqual(node.to_html(), expected_output)
-    
+
     def test_children_props(self):
         node = ParentNode(
             "p",
             [
                 LeafNode("Bold text", "b"),
-                LeafNode("Normal text", "a", props={"href": "https://www.google.com", "target": "_blank"}),
+                LeafNode(
+                    "Normal text",
+                    "a",
+                    props={"href": "https://www.google.com", "target": "_blank"},
+                ),
                 LeafNode("italic text", "i"),
-                LeafNode("Normal text", "a", props={"href": "https://www.google.com", "target": "_blank"}),
+                LeafNode(
+                    "Normal text",
+                    "a",
+                    props={"href": "https://www.google.com", "target": "_blank"},
+                ),
             ],
         )
         expected_output = '<p><b>Bold text</b><a href="https://www.google.com" target="_blank">Normal text</a><i>italic text</i><a href="https://www.google.com" target="_blank">Normal text</a></p>'
         self.assertEqual(node.to_html(), expected_output)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
