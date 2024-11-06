@@ -7,7 +7,8 @@ class TestHTMLNode(unittest.TestCase):
     # Test that HTMLNode can be initialized with None values
     def test_None(self):
         node = HTMLNode(None, None, None, None)
-   # Test that multiple properties are correctly converted to HTML
+
+    # Test that multiple properties are correctly converted to HTML
     def test_props_to_html_with_multiple_props(self):
         node = HTMLNode(props={"href": "https://www.google.com", "target": "_blank"})
         expected_output = ' href="https://www.google.com" target="_blank"'  # Ensure there is a space here
