@@ -109,9 +109,30 @@ class TestMarkdownImages(unittest.TestCase):
         ]
         self.assertEqual(node, expected_output)
 
-    def test_no_alt_text(self):
+    def test_no_alt_text_images(self):
         with self.assertRaises(ValueError):
             node = extract_markdown_images("![](https://i.imgur.com/aKaOqIh.gif)")
+
+class TestMarkdownLinks(unittest.TestCase):
+    def test_single_link(self):
+        node = extract_markdown_links("[to boot dev](https://www.boot.dev)")
+        expected_output = [("to boot dev", "https://www.boot.dev")]
+        self.assertEqual(node, expected_output)
+
+    def test_multiple_links(self):
+        node = extract_markdown_links(
+            """This is text with a link [to boot dev](https://www.boot.dev)
+            and [to youtube](https://www.youtube.com/@bootdotdev)"""
+        )
+        expected_output = [
+            ("to boot dev", "https://www.boot.dev"),
+            ("to youtube", "https://www.youtube.com/@bootdotdev"),
+        ]
+        self.assertEqual(node, expected_output)
+
+    def test_no_alt_text_links(self):
+        with self.assertRaises(ValueError):
+            node = extract_markdown_links("[](https://www.boot.dev)")
 
 if __name__ == "__main__":
     unittest.main()

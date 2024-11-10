@@ -72,3 +72,10 @@ def extract_markdown_images(text):
         if alt_text == "":
             raise ValueError("Missing alt text")
     return image_texts
+
+def extract_markdown_links(text):
+    link_texts = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    for alt_text, _ in link_texts:
+        if alt_text == "":
+            raise ValueError("Missing alt text")
+    return link_texts
