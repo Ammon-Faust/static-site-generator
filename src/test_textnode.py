@@ -66,7 +66,7 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             split_nodes_delimiter([node], "**", TextType.BOLD)
 
     def test_simple_split(self):
-        node =TextNode("This **is** a test!", TextType.TEXT)
+        node = TextNode("This **is** a test!", TextType.TEXT)
         nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
         self.assertEqual(3, len(nodes))
         self.assertEqual("This ", nodes[0].text)
@@ -90,6 +90,28 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         self.assertEqual(TextType.BOLD, nodes[3].text_type)
         self.assertEqual("", nodes[4].text)
         self.assertEqual(TextType.TEXT, nodes[4].text_type)
+
+
+class TestMarkdownImages(unittest.TestCase):
+    def test_single_image(self):
+        node = extract_markdown_images("![rick roll](https://i.imgur.com/aKaOqIh.gif)")
+        expected_output = [("rick roll", "https://i.imgur.com/aKaOqIh.gif")]
+        self.assertEqual(node, expected_output)
+
+    def test_multiple_images(self):
+        node = extract_markdown_images(
+            """This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) 
+            and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"""
+        )
+        expected_output = [
+            ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+            ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg"),
+        ]
+        self.assertEqual(node, expected_output)
+
+    def test_no_alt_text(self):
+        with self.assertRaises(ValueError):
+            node = extract_markdown_images("![](https://i.imgur.com/aKaOqIh.gif)")
 
 if __name__ == "__main__":
     unittest.main()

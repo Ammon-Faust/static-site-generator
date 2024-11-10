@@ -1,5 +1,6 @@
 from enum import Enum
 from warnings import warn
+import re
 
 from htmlnode import *
 
@@ -55,7 +56,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type): # Splits a list of n
             parts = node.text.split(delimiter)
             if len(parts) % 2 == 0:
                 raise ValueError("Missing closing delimiter")
-            for i in range(len(parts)):
+            for i, _ in enumerate(parts):
                 if i % 2 == 0:
                     current_type = TextType.TEXT
                     new_nodes.append(TextNode(parts[i], current_type))
@@ -63,3 +64,11 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type): # Splits a list of n
                     current_type = text_type
                     new_nodes.append(TextNode(parts[i], current_type))
     return new_nodes
+
+
+def extract_markdown_images(text):
+    image_texts = re.findall(r"!\[([^\[\]]*?)\]\(([^\(\)]*?)\)", text)
+    for alt_text, _ in image_texts:
+        if alt_text == "":
+            raise ValueError("Missing alt text")
+    return image_texts
