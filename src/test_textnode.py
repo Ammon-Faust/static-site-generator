@@ -113,6 +113,7 @@ class TestMarkdownImages(unittest.TestCase):
         with self.assertRaises(ValueError):
             node = extract_markdown_images("![](https://i.imgur.com/aKaOqIh.gif)")
 
+
 class TestMarkdownLinks(unittest.TestCase):
     def test_single_link(self):
         node = extract_markdown_links("[to boot dev](https://www.boot.dev)")
@@ -133,6 +134,40 @@ class TestMarkdownLinks(unittest.TestCase):
     def test_no_alt_text_links(self):
         with self.assertRaises(ValueError):
             node = extract_markdown_links("[](https://www.boot.dev)")
+
+
+class TestSplitImagesAndLinks(unittest.TestCase):
+    def test_split_nodes_image(self):
+        node = TextNode("Just plain text", TextType.TEXT)
+        nodes = split_nodes_image([node])
+        assert len(nodes) == 1
+        assert nodes[0].text == "Just plain text"
+
+        # Test 2: One image
+        node = TextNode("Hello ![test](test.png) world", TextType.TEXT)
+        nodes = split_nodes_image([node])
+        assert len(nodes) == 3
+        assert nodes[0].text == "Hello "
+        assert nodes[1].text == "test"
+        assert nodes[1].text_type == TextType.IMAGE
+        assert nodes[1].url == "test.png"
+
+    def test_split_nodes_link(self):
+        # Test 1: No links
+        node = TextNode("Just plain text", TextType.TEXT)
+        nodes = split_nodes_link([node])
+        assert len(nodes) == 1
+        assert nodes[0].text == "Just plain text"
+        
+        # Test 2: One link
+        node = TextNode("Hello [test](https://google.com) world", TextType.TEXT)
+        nodes = split_nodes_link([node])
+        assert len(nodes) == 3
+        assert nodes[0].text == "Hello "
+        assert nodes[1].text == "test"
+        assert nodes[1].text_type == TextType.LINK
+        assert nodes[1].url == "https://google.com"
+
 
 if __name__ == "__main__":
     unittest.main()
