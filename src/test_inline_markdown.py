@@ -1,7 +1,14 @@
 import unittest
+from inline_markdown import (
+    split_nodes_delimiter,
+    split_nodes_image,
+    split_nodes_link,
+    text_to_textnodes,
+    extract_markdown_links,
+    extract_markdown_images,
+)
 
-from inline_markdown import *
-from textnode import *
+from textnode import TextNode, TextType
 
 
 class TestSplitNodesDelimiter(unittest.TestCase):
@@ -119,6 +126,51 @@ class TestSplitImagesAndLinks(unittest.TestCase):
         assert nodes[1].text == "test"
         assert nodes[1].text_type == TextType.LINK
         assert nodes[1].url == "https://google.com"
+
+
+class TestTextToTextNodes(unittest.TestCase):
+    def test_multiple_nodes(self):
+        test_text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode(
+                "obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"
+            ),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+
+        actual = text_to_textnodes(test_text)
+
+        self.assertEqual(len(actual), len(expected))
+        for i, _ in enumerate(actual):
+            self.assertEqual(actual[i].text, expected[i].text)
+            self.assertEqual(actual[i].text_type, expected[i].text_type)
+            self.assertEqual(actual[i].url, expected[i].url)
+
+    def test_multiple_bold_instances(self):
+        test_text = "**bold** some text **more bold**"
+        expected = [
+            TextNode("", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" some text ", TextType.TEXT),
+            TextNode("more bold", TextType.BOLD),
+            TextNode("", TextType.TEXT),
+        ]
+        actual = text_to_textnodes(test_text)
+
+        self.assertEqual(len(actual), len(expected))
+
+    def test_incomplete_bold_delimiter(self):
+        test_text = "**bold without closing and **another bold**"
+        with self.assertRaises(ValueError):
+            text_to_textnodes(test_text)
 
 
 if __name__ == "__main__":
