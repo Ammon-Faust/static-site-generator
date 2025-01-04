@@ -1,9 +1,8 @@
-import re
-from enum import Enum
 from htmlnode import LeafNode
+from enum import Enum
 
 
-class TextType(Enum):  # Enum of text types we will take
+class TextType(Enum):
     TEXT = "text"
     BOLD = "bold"
     ITALIC = "italic"
@@ -12,7 +11,7 @@ class TextType(Enum):  # Enum of text types we will take
     IMAGE = "image"
 
 
-class TextNode:  # Defining TextNode
+class TextNode:
     def __init__(self, text, text_type, url=None):
         self.text = text
         self.text_type = text_type
@@ -26,22 +25,21 @@ class TextNode:  # Defining TextNode
         )
 
     def __repr__(self):
-        return f"TextNode({self.text}, {self.text_type}, {self.url})"
+        return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
 
 
-def text_node_to_html_node(text_node):  # Takes text node and turns it into a LeafNode
+def text_node_to_html_node(text_node):
     if text_node.text_type == TextType.TEXT:
-        return LeafNode(text_node.text)
+        return LeafNode(None, text_node.text)
     if text_node.text_type == TextType.BOLD:
-        return LeafNode(text_node.text, "b", None)
+        return LeafNode("b", text_node.text)
     if text_node.text_type == TextType.ITALIC:
-        return LeafNode(text_node.text, "i", None)
+        return LeafNode("i", text_node.text)
     if text_node.text_type == TextType.CODE:
-        return LeafNode(text_node.text, "code", None)
+        return LeafNode("code", text_node.text)
     if text_node.text_type == TextType.LINK:
-        return LeafNode(text_node.text, "a", props={"href": text_node.url})
+        return LeafNode("a", text_node.text, {"href": text_node.url})
     if text_node.text_type == TextType.IMAGE:
-        return LeafNode("", "img", props={"src": text_node.url, "alt": text_node.text})
-    raise ValueError("Invalid TextType")
-
+        return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
+    raise ValueError(f"Invalid text type: {text_node.text_type}")
 
